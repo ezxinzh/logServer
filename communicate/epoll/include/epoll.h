@@ -8,6 +8,6 @@
 #ifndef COMMUNICATE_EPOLL_INCLUDE_EPOLL_H_
 #define COMMUNICATE_EPOLL_INCLUDE_EPOLL_H_
 
-
+/*==========================================*/
 
 #endif /* COMMUNICATE_EPOLL_INCLUDE_EPOLL_H_ */
