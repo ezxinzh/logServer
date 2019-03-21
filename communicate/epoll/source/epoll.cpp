@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <iostream>
-
 #include "epoll.h"
 
 using namespace std;

@@ -10,6 +10,4 @@
 
 
 
-
-
 #endif /* COMMUNICATE_EPOLL_INCLUDE_EPOLL_H_ */
