@@ -58,11 +58,11 @@ void do_epoll(int listenfd)
     struct epoll_event events[ EPOLLEVENTS];
     int ret;
     char buf[ MAXSIZE];
-    memset( buf, 0, MAXSIZE);
+    memset(buf, 0, MAXSIZE);
     /*创建一个描述符*/
     epollfd = epoll_create( FDSIZE);
     /*添加监听描述符事件*/
-    add_event( epollfd, listenfd, EPOLLIN);
+    add_event(epollfd, listenfd, EPOLLIN);
     while(1)
     {
         /*获取已经准备好的描述符事件*/
@@ -82,11 +82,11 @@ void handle_events(int epollfd, struct epoll_event *events, int num, int listenf
         fd = events[i].data.fd;
         /*根据描述符的类型和事件类型进行处理*/
         if ((fd == listenfd) &&(events[ i]. events & EPOLLIN))
-            handle_accpet( epollfd, listenfd);
-        else if (events[ i].events & EPOLLIN)
-            do_read( epollfd, fd, buf);
-        else if (events[ i].events & EPOLLOUT)
-            do_write( epollfd, fd, buf);
+            handle_accpet(epollfd, listenfd);
+        else if (events[i].events & EPOLLIN)
+            do_read(epollfd, fd, buf);
+        else if (events[i].events & EPOLLOUT)
+            do_write(epollfd, fd, buf);
     }
 }
 
@@ -124,7 +124,7 @@ void do_read(int epollfd, int fd, char *buf)
     }
     else
     {
-        printf("======read message is : %s\n", buf);
+        printf("======received message: %s from client:%d.\n", buf, fd);
         /*修改描述符对应的事件，由读改为写*/
         modify_event( epollfd, fd, EPOLLOUT);
     }
@@ -133,7 +133,7 @@ void do_read(int epollfd, int fd, char *buf)
 void do_write(int epollfd, int fd, char *buf)
 {
     int nwrite;
-    nwrite = write( fd, buf, strlen( buf));
+    nwrite = write(fd, buf, strlen(buf));
     if (nwrite == -1)
     {
         perror(" write error:");
@@ -142,7 +142,7 @@ void do_write(int epollfd, int fd, char *buf)
     }
     else
         modify_event(epollfd, fd, EPOLLIN);
-    memset( buf, 0, MAXSIZE);
+    memset(buf, 0, MAXSIZE);
 }
 
 void add_event( int epollfd, int fd, int state)
