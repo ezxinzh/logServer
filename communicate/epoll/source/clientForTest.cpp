@@ -1,4 +1,4 @@
-#if 1
+#if 0
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -13,7 +13,7 @@
 #include <poll.h>
 
 #define MAXLINE 1024
-#define DEFAULT_PORT (32006)
+#define DEFAULT_PORT (9981)
 //#define DEFAULT_ADDR ("120.78.206.87")
 #define max( a, b) (a > b) ? a : b
 static void handle_connection( int sockfd);
@@ -48,7 +48,7 @@ int main( int argc, char *argv[])
         printf("connect server:%s successful.\n", inet_ntoa(client.sin_addr));
         write(connfd, "hello server, i am client.\n", strlen("hello server, i am client.\n"));
     }
-    /*´¦Àí Á¬½Ó ÃèÊö ·û*/
+    /*ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½*/
     handle_connection(connfd);
     return 0;
 }
@@ -58,11 +58,11 @@ static void handle_connection( int sockfd)
     char recvline[MAXLINE];
     int maxfdp, stdineof;
     struct pollfd pfds[2];
-    /* Ìí¼ÓÁ¬½ÓÃèÊö·û */
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     int n;
     pfds[0].fd = sockfd;
     pfds[0].events = POLLIN;
-    /* Ìí¼Ó±ê×¼ÊäÈëÃèÊö·û */
+    /* ï¿½ï¿½Ó±ï¿½×¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
     pfds[1].fd = STDIN_FILENO;
     pfds[1].events = POLLIN;
     int cnt = 0;
@@ -81,8 +81,8 @@ static void handle_connection( int sockfd)
                 fprintf(stderr, "client:server is closed.");
                 close(sockfd);
             }
-//            write(STDOUT_FILENO, recvline, n);
-//            write(STDOUT_FILENO, "\n", n);
+            write(STDOUT_FILENO, recvline, n);
+            write(STDOUT_FILENO, "\n", n);
             if(cnt >= 32767)
                 cnt = 0;
             cnt += 1;
@@ -92,7 +92,7 @@ static void handle_connection( int sockfd)
             write(sockfd, sendline, strlen(sendline));
             usleep(100000);
         }
-        /* ²âÊÔ±ê×¼ÊäÈëÊÇ·ñ×¼±¸ºÃ */
+        /* ï¿½ï¿½ï¿½Ô±ï¿½×¼ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½×¼ï¿½ï¿½ï¿½ï¿½ */
         if(pfds[1].revents & POLLIN)
         {
             n = read(STDIN_FILENO, sendline, MAXLINE);
