@@ -6,7 +6,7 @@
 // Version     : V0.1
 // date        : 2019.3.21
 //============================================================================
-
+#if 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -177,3 +177,5 @@ int main( int argc, char *argv[])
     do_epoll( listenfd);
     return 0;
 }
+
+#endif
