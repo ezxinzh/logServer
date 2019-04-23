@@ -5,48 +5,50 @@
  *      Author: root
  */
 
-#include "tcpServer/TcpServer.h"
-#include "tcpServer/EventLoop.h"
-#include "tcpServer/InetAddress.h"
+#include "muduo/net/TcpServer.h"
+#include "muduo/net/EventLoop.h"
+#include "muduo/net/InetAddress.h"
 #include <stdio.h>
 
 using namespace std;
+using namespace muduo;
+using namespace muduo::net;
 
 std::string message;
 
-void onConnection(const muduo::TcpConnectionPtr& conn)
+void onConnection(const TcpConnectionPtr& conn)
 {
   if (conn->connected())
   {
     printf("onConnection(): tid=%d new connection [%s] from %s\n",
            muduo::CurrentThread::tid(),
            conn->name().c_str(),
-           conn->peerAddress().toHostPort().c_str());
+           conn->peerAddress().toIpPort().c_str());
     conn->send(message);
   }
   else
   {
     printf("onConnection(): tid=%d connection [%s] is down\n",
-           muduo::CurrentThread::tid(),
+           CurrentThread::tid(),
            conn->name().c_str());
   }
 }
 
-void onWriteComplete(const muduo::TcpConnectionPtr& conn)
+void onWriteComplete(const TcpConnectionPtr& conn)
 {
 //  conn->send(message);
 }
 
-void onMessage(const muduo::TcpConnectionPtr& conn,
-               muduo::Buffer* buf,
-               muduo::Timestamp receiveTime)
+void onMessage(const TcpConnectionPtr& conn,
+        Buffer* buf,
+        Timestamp receiveTime)
 {
   printf("onMessage(): tid=%d received %zd bytes from connection [%s] at %s\n",
-         muduo::CurrentThread::tid(),
+         CurrentThread::tid(),
          buf->readableBytes(),
          conn->name().c_str(),
          receiveTime.toFormattedString().c_str());
-  printf("      ======> %s\n", buf->retrieveAsString().c_str());
+  printf("      ======> %s\n", buf->retrieveAllAsString().c_str());
 
   buf->retrieveAll();
 }
@@ -74,10 +76,10 @@ int main(int argc, char* argv[])
 
     message = "hello, i am log server\n";
 
-    muduo::InetAddress listenAddr(32006);
-    muduo::EventLoop loop;
+    InetAddress listenAddr(32006);
+    EventLoop loop;
 
-    muduo::TcpServer server(&loop, listenAddr);
+    TcpServer server(&loop, listenAddr, "LogServer");
     server.setConnectionCallback(onConnection);
     server.setMessageCallback(onMessage);
     server.setWriteCompleteCallback(onWriteComplete);
