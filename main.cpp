@@ -8,13 +8,26 @@
 #include "muduo/net/TcpServer.h"
 #include "muduo/net/EventLoop.h"
 #include "muduo/net/InetAddress.h"
+#include "muduo/base/AsyncLogging.h"
+#include "muduo/base/Logging.h"
+#include "muduo/base/Timestamp.h"
+
 #include <stdio.h>
+#include <sys/resource.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
 std::string message;
+off_t kRollSize = 500*1000*1000;
+muduo::AsyncLogging* g_asyncLog = NULL;
+
+void asyncOutput(const char* msg, int len)
+{
+  g_asyncLog->append(msg, len);
+}
 
 void onConnection(const TcpConnectionPtr& conn)
 {
@@ -48,7 +61,8 @@ void onMessage(const TcpConnectionPtr& conn,
          buf->readableBytes(),
          conn->name().c_str(),
          receiveTime.toFormattedString().c_str());
-  printf("      ======> %s\n", buf->retrieveAllAsString().c_str());
+//  printf("      ======> %s\n", buf->retrieveAllAsString().c_str());
+  LOG_INFO<<(buf->retrieveAllAsString().c_str());
 
   buf->retrieveAll();
 }
@@ -61,6 +75,23 @@ int main(int argc, char* argv[])
       return 0;
     }
     printf("main(): pid = %d\n", getpid());
+
+    /*====================AsyncLogging test====================*/
+    {
+      // set max virtual memory to 2GB.
+      size_t kOneGB = 1000*1024*1024;
+      rlimit rl = { 2*kOneGB, 2*kOneGB };
+      setrlimit(RLIMIT_AS, &rl);
+    }
+
+    char name[256] = { 0 };
+    strncpy(name, argv[0], sizeof(name) - 1);
+    muduo::AsyncLogging log(::basename(name), kRollSize);
+    log.start();
+    g_asyncLog = &log;
+    muduo::Logger::setOutput(asyncOutput);
+    LOG_INFO<<"hello, i am AsyncLogging test.";
+    /*====================AsyncLogging test end====================*/
 
     //  std::string line;
     //  for (int i = 33; i < 127; ++i)
@@ -87,8 +118,8 @@ int main(int argc, char* argv[])
     server.setThreadNum(atoi(argv[1]));
     }
     server.start();
-
     loop.loop();
+    printf("======file[%s] func[%s] line[%d] do here.\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 
